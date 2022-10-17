@@ -13,5 +13,5 @@ DEBUG = True
 # Connect to the database
 
 
-# TODO IMPLEMENT DATABASE URL
+# IMPLEMENT DATABASE URL -> DB_URI is stored in .env file
 SQLALCHEMY_DATABASE_URI = os.environ['DB_URI']
