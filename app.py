@@ -370,11 +370,11 @@ def create_artist_submission():
             genres = "-".join([genre.value for genre in form.genres.data])
         try:
             artist = Artist(
-               name=form.name.data, phone=form.phone.data, state=form.state.data,
-              website_link=form.website_link.data, facebook_link=form.facebook_link.data,
-              seeking_venue=form.seeking_venue.data, image_link=form.image_link.data,
-              seeking_description=form.seeking_description.data, city=form.city.data,
-              genres=genres,
+                name=form.name.data, phone=form.phone.data, state=form.state.data,
+                website_link=form.website_link.data, facebook_link=form.facebook_link.data,
+                seeking_venue=form.seeking_venue.data, image_link=form.image_link.data,
+                seeking_description=form.seeking_description.data, city=form.city.data,
+                genres=genres,
             )
             db.session.add(artist)
             db.session.commit()
