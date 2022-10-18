@@ -146,7 +146,11 @@ class VenueForm(Form):
         'address', validators=[DataRequired()]
     )
     phone = StringField(
-        'phone'
+        'phone',
+        validators=[
+            Regexp(regex=r'^\s*\d{3}-\d{3}-\d{4}\s*$',
+                   message="Phone number muts be like xxx-xxx-xxxx")
+        ]
     )
     image_link = StringField(
         'image_link'
@@ -159,7 +163,7 @@ class VenueForm(Form):
         'facebook_link', validators=[Optional(), URL()]
     )
     website_link = StringField(
-        'website_link'
+        'website_link', validators=[URL()]
     )
 
     seeking_talent = BooleanField('seeking_talent')
@@ -236,7 +240,7 @@ class ArtistForm(Form):
         'phone',
         validators=[
             Regexp(regex=r'^\s*\d{3}-\d{3}-\d{4}\s*$',
-            message="Phone number muts be like xxx-xxx-xxxx")
+                   message="Phone number muts be like xxx-xxx-xxxx")
         ]
     )
     image_link = StringField(
@@ -251,7 +255,7 @@ class ArtistForm(Form):
      )
 
     website_link = StringField(
-        'website_link'
+        'website_link', validators=[Optional(), URL()]
      )
 
     seeking_venue = BooleanField('seeking_venue')

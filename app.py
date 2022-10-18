@@ -315,6 +315,7 @@ def edit_artist_submission(artist_id):
         flash('An error occurred. Form is not  valid', 'error')
     return render_template('forms/edit_artist.html', form=form, artist=artist)
 
+
 @app.route('/venues/<int:venue_id>/edit', methods=['GET'])
 def edit_venue(venue_id):
     venue = Venue.query.get(venue_id)
@@ -390,11 +391,13 @@ def create_artist_submission():
         else:
             flash(f'An error occurred. Venue {form.name.data} could not be listed.')
     else:
-        flash('An error occurred. Form is not  valid', 'error')
+        message = [f'{field} ' + '|'.join(err) for field, err in form.errors.items()]
+        flash(f'Errors {message}')
     return render_template('forms/new_artist.html', form=form)
 
 #  Shows
 #  ----------------------------------------------------------------
+
 
 @app.route('/shows')
 def shows():
