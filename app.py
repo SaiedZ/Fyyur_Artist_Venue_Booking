@@ -90,12 +90,12 @@ def venues():
 def search_venues():
     search_term = request.form['search_term']
     venues = Venue.query.filter(Venue.name.ilike(f"%{search_term}%")).all()
-
+    current_time = datetime.now()
     data = []
 
     for venue in venues:
         num_upcoming_shows = Show.query.filter(
-          Show.artist_id == venue.id, Show.start_time > datetime.now()
+          Show.artist_id == venue.id, Show.start_time > current_time
           ).count()
         data.append({
             "id": venue.id,
@@ -221,12 +221,12 @@ def search_artists():
 
     search_term = request.form['search_term']
     artists = Artist.query.filter(Artist.name.ilike(f"%{search_term}%")).all()
-
+    current_time = datetime.now()
     data = []
 
     for artist in artists:
         num_upcoming_shows = Show.query.filter(
-          Show.artist_id == artist.id, Show.start_time > datetime.now()
+          Show.artist_id == artist.id, Show.start_time > current_time
           ).count()
         data.append({
             "id": artist.id,
