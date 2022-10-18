@@ -1,7 +1,69 @@
 from datetime import datetime
+import re
 from flask_wtf import Form
-from wtforms import StringField, SelectField, SelectMultipleField, DateTimeField, BooleanField
-from wtforms.validators import DataRequired, AnyOf, URL
+from wtforms import (StringField, SelectField,
+                     SelectMultipleField, DateTimeField,
+                     BooleanField)
+from wtforms.validators import DataRequired, AnyOf, URL, Regexp, Optional
+
+import enum
+from markupsafe import escape
+
+
+class Genres(enum.Enum):
+    Blues = 'Blues'
+    Classical = 'Classical'
+    Country = 'Country'
+    Electronic = 'Electronic'
+    Folk = 'Folk'
+    Funk = 'Funk'
+    HipHop = 'Hip-Hop'
+    HeavyMetal = 'Heavy Metal'
+    Instrumental = 'Instrumental'
+    Jazz = 'Jazz'
+    MusicalTheatre = 'Musical Theatre'
+    Pop = 'Pop'
+    Punk = 'Punk'
+    RB = 'R&B'
+    Reggae = 'Reggae'
+    RockNRoll = 'Rock n Roll'
+    Alternative = 'Alternative'
+    Soul = 'Soul'
+    Other = 'Other'
+
+    def __str__(self):
+        return self.name  # value string
+
+    def __html__(self):
+        return self.value  # label string
+
+
+def enum_field_options(enum):
+    """Produce WTForm Field instance configuration options for an Enum
+
+    Returns a dictionary with 'choices' and 'coerce' keys, use this as
+    **enum_fields_options(EnumClass) when constructing a field:
+
+    enum_selection = SelectField("Enum Selection", **enum_field_options(EnumClass))
+
+    Labels are produced from str(enum_instance.value) or
+    str(eum_instance), value strings with str(enum_instance).
+
+    """
+    assert not {'__str__', '__html__'}.isdisjoint(vars(enum)), (
+        "The {!r} enum class does not implement __str__ and __html__ methods")
+
+    def coerce(name):
+        if isinstance(name, enum):
+            # already coerced to instance of this enum
+            return name
+        try:
+            return enum[name]
+        except KeyError:
+            raise ValueError(name)
+
+    return {'choices': [(v, escape(v)) for v in enum], 'coerce': coerce}
+
 
 class ShowForm(Form):
     artist_id = StringField(
@@ -13,8 +75,9 @@ class ShowForm(Form):
     start_time = DateTimeField(
         'start_time',
         validators=[DataRequired()],
-        default= datetime.today()
+        default=datetime.today()
     )
+
 
 class VenueForm(Form):
     name = StringField(
@@ -89,43 +152,21 @@ class VenueForm(Form):
         'image_link'
     )
     genres = SelectMultipleField(
-        # TODO implement enum restriction
         'genres', validators=[DataRequired()],
-        choices=[
-            ('Alternative', 'Alternative'),
-            ('Blues', 'Blues'),
-            ('Classical', 'Classical'),
-            ('Country', 'Country'),
-            ('Electronic', 'Electronic'),
-            ('Folk', 'Folk'),
-            ('Funk', 'Funk'),
-            ('Hip-Hop', 'Hip-Hop'),
-            ('Heavy Metal', 'Heavy Metal'),
-            ('Instrumental', 'Instrumental'),
-            ('Jazz', 'Jazz'),
-            ('Musical Theatre', 'Musical Theatre'),
-            ('Pop', 'Pop'),
-            ('Punk', 'Punk'),
-            ('R&B', 'R&B'),
-            ('Reggae', 'Reggae'),
-            ('Rock n Roll', 'Rock n Roll'),
-            ('Soul', 'Soul'),
-            ('Other', 'Other'),
-        ]
+        **enum_field_options(Genres)
     )
     facebook_link = StringField(
-        'facebook_link', validators=[URL()]
+        'facebook_link', validators=[Optional(), URL()]
     )
     website_link = StringField(
         'website_link'
     )
 
-    seeking_talent = BooleanField( 'seeking_talent' )
+    seeking_talent = BooleanField('seeking_talent')
 
     seeking_description = StringField(
         'seeking_description'
     )
-
 
 
 class ArtistForm(Form):
@@ -192,48 +233,29 @@ class ArtistForm(Form):
         ]
     )
     phone = StringField(
-        # TODO implement validation logic for state
-        'phone'
+        'phone',
+        validators=[
+            Regexp(regex=r'^\s*\d{3}-\d{3}-\d{4}\s*$',
+            message="Phone number muts be like xxx-xxx-xxxx")
+        ]
     )
     image_link = StringField(
         'image_link'
     )
     genres = SelectMultipleField(
         'genres', validators=[DataRequired()],
-        choices=[
-            ('Alternative', 'Alternative'),
-            ('Blues', 'Blues'),
-            ('Classical', 'Classical'),
-            ('Country', 'Country'),
-            ('Electronic', 'Electronic'),
-            ('Folk', 'Folk'),
-            ('Funk', 'Funk'),
-            ('Hip-Hop', 'Hip-Hop'),
-            ('Heavy Metal', 'Heavy Metal'),
-            ('Instrumental', 'Instrumental'),
-            ('Jazz', 'Jazz'),
-            ('Musical Theatre', 'Musical Theatre'),
-            ('Pop', 'Pop'),
-            ('Punk', 'Punk'),
-            ('R&B', 'R&B'),
-            ('Reggae', 'Reggae'),
-            ('Rock n Roll', 'Rock n Roll'),
-            ('Soul', 'Soul'),
-            ('Other', 'Other'),
-        ]
-     )
+        **enum_field_options(Genres)
+    )
     facebook_link = StringField(
-        # TODO implement enum restriction
-        'facebook_link', validators=[URL()]
+        'facebook_link', validators=[Optional(), URL()]
      )
 
     website_link = StringField(
         'website_link'
      )
 
-    seeking_venue = BooleanField( 'seeking_venue' )
+    seeking_venue = BooleanField('seeking_venue')
 
     seeking_description = StringField(
             'seeking_description'
      )
-
